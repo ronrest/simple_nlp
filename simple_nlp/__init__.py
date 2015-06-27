@@ -15,8 +15,7 @@ def tokenize(text, levels_out=1):
     Takes a string of text, and returns a list of tokenized words.
 
     You can chose to have the tokenized words nested at different levels if you
-    wish to group by sentences (levels_out=2), or paragraphs (levels_out=3)
-    preserve
+    wish to group by sentences (levels_out=2), or paragraphs (levels_out=3).
 
     :param text: (string) The input string that you want to tokenize
     :param levels_out: (int) nesting level of the word tokens.
@@ -32,6 +31,13 @@ def tokenize(text, levels_out=1):
              strings,or a list of list of strings, or a list of list of list of
              strings.
     """
+    assert isinstance(text, str), \
+        "Argument *text* in tokenize() must be a string"
+    assert isinstance(levels_out, int), \
+        "Argument *levels_out* in tokenize() must be an integer"
+    assert (levels_out >=1) and (levels_out <=3), \
+        "Argument *levels_out* in tokenize() can only take the values 1, 2 or 3"
+
     if (levels_out == 1):
         return(nltk.word_tokenize(text))
     if (levels_out == 2):
@@ -44,7 +50,4 @@ def tokenize(text, levels_out=1):
             sentences = nltk.sent_tokenize(paragraph)
             tokenized.append([nltk.word_tokenize(sentence) for sentence in sentences])
         return(tokenized)
-    else:
-        # TODO: throw some kind of exception about incorrect value.
-        print("levels_out must be 1,2 or 3.")
-        return(None)
+
