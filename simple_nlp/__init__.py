@@ -4,6 +4,7 @@
 =======================================================
 """
 __author__ = 'ronny'
+from __future__ import print_function
 
 import nltk
 

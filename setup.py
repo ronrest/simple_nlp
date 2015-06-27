@@ -12,13 +12,30 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-# Get the long description from the relevant file
+#-------------------------------------------------------------------------------
+#                                                        Extract info from files
+#-------------------------------------------------------------------------------
+# Extract version number from VERSION file
+version_file = path.join(path.dirname(__file__), 'simple_nlp', 'VERSION')
+with open(version_file, encoding='utf-8') as f:
+    version = f.read().strip()
+
+# Extract long description from DESCRIPTION.rst file
 with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+#-------------------------------------------------------------------------------
+#                                                                          Setup
+#-------------------------------------------------------------------------------
 setup(
     name='simple_nlp',
-    version='0.1.0.dev1',
+    version=version,
+    license='MIT',
+    keywords=['NLP', 'natural language processing', 'computational linguistics',
+              'linguistics', 'language', 'natural language', 'text analytics',
+              'parsing', 'tagging', 'tokenizing', 'syntax','stemming', 'POS',
+              'lemmatization', 'chunking'],
+
     description='A convenience wrapper for common nltk tasks',
     long_description=long_description,
 
@@ -26,11 +43,12 @@ setup(
     url='https://github.com/ronrest/simple_nlp',
 
     # Author details
-    author='Ronny Restrepo',
-    author_email='ronny.coding@gmail.com',
+    maintainer="Ronny Restrepo",
+    maintainer_email="ronny.coding@gmail.com",
+    author="Ronny Restrepo",
+    author_email="ronny.coding@gmail.com",
 
-    license='MIT',
-
+    # Classifiers
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -39,26 +57,34 @@ setup(
         #   5 - Production/Stable
         'Development Status :: 3 - Alpha',
 
-        # Indicate who your project is intended for
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
+
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: Science/Research',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
-    ],
 
-    # What does your project relate to?
-    keywords='nlp nltk natural_language_processing',
+        'Operating System :: OS Independent',
+
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Text Processing',
+        'Topic :: Text Processing :: Filters',
+        'Topic :: Text Processing :: General',
+        'Topic :: Text Processing :: Indexing',
+        'Topic :: Text Processing :: Linguistic',
+    ],
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
