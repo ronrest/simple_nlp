@@ -63,7 +63,7 @@ def tokenize(text, levels_out=1):
 # ==============================================================================
 def pos_tag(tokens):
     """
-    Takes a list of tokens and returns a list of Part of Speech (POS) Tagged
+    Takes a list of tokens and returns a list of "Part of Speech" (POS) Tagged
     tupples.
 
     You feed in a list which contains tokens. The tokens can be nested between 1
@@ -126,36 +126,43 @@ def pos_tag(tokens):
         return(None)
 
 
-
-
-
-
-
-
 # ==============================================================================
 #                                                                      GET LEVEL
 # ==============================================================================
-def get_level(x):
+def get_level(x, type="token"):
     """
     Takes a list of token strings, and returns how many levels deep the tokens
     are.
 
     :param x: (list) The list of tokens
-    :return: (int) an integer representing how many levels deep the string
-              tokens are.
+    :param type: (string) the type of element to look for.
+                 type="token" looks for token strings
+                 type="pos_tagged" looks for tuples with two string elements.
+    :return: (int) an integer representing how many levels deep the desired
+              items are
     """
-    assert isinstance(x, list), "Argument *x* in get_level must be a list"
+    # TODO: test that all elements of the list are consistently the same depth.
 
-    #TODO: test that all elements of the list are consistently the same depth.
+    assert isinstance(x, list), "Argument *x* in get_level must be a list"
+    assert (type == "token") or (type == "pos_tagged"), \
+        "Argument *type* in get_level() function only accepts the values " \
+        "'token' or 'pos_tagged'"
+
+    if type == "token":
+        data_type = str
+        data_type_description = "strings"
+    elif type == "pos_tagged":
+        data_type = tuple
+        data_type_description = "tuples"
 
     current_nest = x[0]
     level = 1
     while level <= 3:
-        if isinstance(current_nest, str):
+        if isinstance(current_nest, data_type):
             break
         elif not isinstance(current_nest, list):
             #TODO: throw a type exception
-            print("x must be a nested list of strings")
+            print("x must be a nested list of {}".format(data_type_description))
             return(None)
         else:
             current_nest = current_nest[0]
@@ -165,3 +172,87 @@ def get_level(x):
         print("You are in too deep! get_level() only processes up to 3 levels deep.")
         return(None)
     return(level)
+
+# ==============================================================================
+#                                                          CHUNK PRESET PATTERNS
+# ==============================================================================
+CHUNK_PATTERN_NP1  = """
+CHUNKED_NP:     {<DT><WP><VBP>*<RB>*<VBN><IN><NN>}
+                {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
+                {<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}
+                {<JJ>*<NN|NNS|NNP|NNPS>+}
+"""
+
+
+# ==============================================================================
+#                                                                          CHUNK
+# ==============================================================================
+def chunk(tagged_list, pattern=CHUNK_PATTERN_NP1):
+    """
+    Takes a list of POS tagged items, and chunks them according to the pattern.
+
+    depending on how deeply nested the POS tagged items are, will determine
+    how deeply nested the tree chunk are.
+
+    Note, that in the pattern, not only can you specify the chunking regular
+    expressions, but you can also specify the chinking regular expressions to
+    remove things subtractively after chunking. For chinking, just use the
+    curly brackets in reverse  eg:
+         } patern_here {
+
+    :param tagged_list: a list of POS tagged items.
+    :param pattern: a chunking pattern. Several preset patterns exist:
+                    - CHUNK_PATTERN_NP1  pattern for Noun Phrases
+    :return: returns a list of trees, with certain tokens chunked together based
+             on rules specified by the *pattern* variable.
+
+    :examples:
+        s = "Joe Blogs gave us tickets to the show.\n" \
+            "The humorous comedian entertained Alice and Bob. "\
+            "The clown, however, frightened us."
+        t = tokenize(s, levels_out=3)
+        pos_tagged=pos_tag(t)
+
+        # Chunk based on Noun Phrases using the CHUNK_PATTERN_NP1 template
+        noun_phrase_chunked = chunk(pos_tagged, pattern=CHUNK_PATTERN_NP1)
+        noun_phrase_chunked[0][0].draw()
+        noun_phrase_chunked[1][0].draw()
+    """
+    # #TODO: create a function called check_nesting_assumptions() since the
+    # #      following is reused so often.
+    # assert isinstance(tagged_list, list), \
+    #     "Argument *tokens* in pos_tag() function must be a list."
+    try:
+        levels = get_level(tagged_list, type="pos_tagged")
+    except Exception as e:
+        # TODO: throw a real error message.
+        print(str(e))
+        #print("Something went with the tagged_list list")
+        return(None)
+    assert isinstance(levels, int), \
+         "Something wrong with the *tokens* list argument in pos_tag() function"
+    assert (levels >= 1) and (levels <= 3), \
+         "The depth of levels for *tokens* list must be in the range [1, 3]"
+
+    chunker = nltk.RegexpParser(pattern)
+    try:
+        if (levels == 1):
+            return(chunker.parse(tagged_list))
+        elif (levels == 2):
+            return([chunker.parse(sentence) for sentence in tagged_list])
+        elif (levels == 3):
+            chunked = []
+            for paragraph in tagged_list:
+                chunked_sentences = [chunker.parse(sentence) for sentence in paragraph]
+                chunked.append(chunked_sentences)
+            return (chunked)
+        else:
+            # TODO: throw some error messsage
+            print(
+                "Something went wrong with chunk(). Double check your arguments.")
+            return (None)
+    except Exception as e:
+        #TODO: throw a real error message.
+        print(str(e))
+
+
