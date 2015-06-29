@@ -171,8 +171,8 @@ def get_level(x, type="token", max_level=3):
 # https://github.com/lukewrites/NP_chunking_with_nltk
 # Written by: lukewrites
 CHUNK_PATTERN_NP1 = """
-    NP: {<JJ>*<NN>+}
-    {<JJ>*<NN><CC>*<NN>+}
+    CHUNKED_NP: {<JJ>*<NN>+}
+                {<JJ>*<NN><CC>*<NN>+}
 """
 
 # This pattern was taken from
@@ -195,7 +195,7 @@ CHUNK_PATTERN_NP3 = """CHUNKED_NP: {<RB.?>*<VB.?>*<NNP>+<NN>?}"""
 # ==============================================================================
 #                                                                          CHUNK
 # ==============================================================================
-def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
+def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary=False):
     """
     Takes a list of POS tagged items, and chunks them according to the pattern.
 
@@ -216,7 +216,7 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
                     - CHUNK_PATTERN_NP3  Another pattern for Noun Phrases
 
     :param ne: (boolean) Make use of nltk's built in Named Entity Recognition?
-    :param binary_ne: (boolean) Should the built in Named Entity Recognition use
+    :param binary: (boolean) Should the built in Named Entity Recognition use
                       binary classification?
 
                       - True - will classify the chunks as either Named Entities
@@ -243,13 +243,13 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
         ne_chunked = chunk(pos_tagged, ne=True)
 
         # As above, but categorize the named entities by type
-        ne_chunked = chunk(pos_tagged, ne=True, binary_ne=False)
+        ne_chunked = chunk(pos_tagged, ne=True, binary=False)
 
     """
     # ==========================================================================
     # Handle the use of the built in Named Entity Recognition
     if ne:
-        return (named_entities(tagged_list, binary_ne))
+        return (named_entities(tagged_list, binary))
 
     # Perform Chunking based on Regex Pattern
     levels = get_level(tagged_list, type="pos_tagged") # Depth of tagged_list
