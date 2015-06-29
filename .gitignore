@@ -1,2 +1,7 @@
 .idea
 .gitignore
+.Rproj.user
+.Rhistory
+*.Rproj
+README.html
+simple_nlp.egg-info/*
