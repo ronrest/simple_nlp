@@ -277,24 +277,64 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
     levels = get_level(tagged_list, type="pos_tagged") # Depth of tagged_list
     chunker = nltk.RegexpParser(pattern)
     try:
+
+# ==============================================================================
+#                                                                MULTILEVEL CALL
+# ==============================================================================
+def _multilevel_call(x, list_type, level1_func, level2_func=None, **kwargs):
+    """
+    A convenience function that takes a list of nested elements and a pointer
+    to a function that processes the elements, and returns another nested list
+    that contains the processed elements.
+
+    Assumes that the first arguments of level1_func and level2_func are the
+    list x (or its appropriate subsets depending on level)
+
+    :param x: (list) The list contianing the elements
+    :param list_type: The type of elements the list contains. Legal values are:
+
+                      - "token"
+                      - "pos_tagged"
+
+    :param level1_func: The function that processes individual elements
+    :param level2_func: The function that processes 2nd level lists (optional)
+    :param **kwargs: Additional arguments to be passed on to the functions other
+                   than the list itself
+    :return: returns the output of the functions specified, applied to the
+             elements of the list x.
+    """
+    # Get the depth of list
+    levels = get_level(x, type=list_type, max_level=3)
+
+    try:
+        # -------------------------------------------------- Level 1
         if (levels == 1):
-            return(chunker.parse(tagged_list))
+            return level1_func(x, **kwargs)
+
+        # -------------------------------------------------- Level 2
         elif (levels == 2):
-            return([chunker.parse(sentence) for sentence in tagged_list])
+            if level2_func is not None:
+                return level2_func(x, **kwargs)
+            else:
+                return [level1_func(sentence, **kwargs) for sentence in x]
+
+        # -------------------------------------------------- Level 3
         elif (levels == 3):
-            chunked = []
-            for paragraph in tagged_list:
-                chunked_sentences = [chunker.parse(sentence) for sentence in paragraph]
-                chunked.append(chunked_sentences)
-            return (chunked)
-        else:
-            # TODO: throw some error messsage
-            print(
-                "Something went wrong with the chunk() function.\n"\
-                "Double check your arguments.")
-            return (None)
+            processed = []
+            for paragraph in x:
+                processed_sentences = _multilevel_call(paragraph,
+                                                       list_type,
+                                                       level1_func,
+                                                       level2_func,
+                                                       **kwargs)
+                processed.append(processed_sentences)
+            return processed
+
     except Exception as e:
-        #TODO: throw a real error message.
+        # TODO: throw a real error message.
+        print("Ohh oh! multilevel call went funny!")
         print(str(e))
+        return(None)
+
 
 
