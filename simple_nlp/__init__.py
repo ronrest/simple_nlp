@@ -57,7 +57,6 @@ def tokenize(text, levels_out=1):
         return(tokenized)
 
 
-
 # ==============================================================================
 #                                                                    POS TAGGING
 # ==============================================================================
@@ -97,33 +96,14 @@ def pos_tag(tokens):
         pos_tag(b)
         pos_tag(d)
     """
+    # ==========================================================================
     # TODO: make it accept a single string that is not nested in a list.
-    assert isinstance(tokens, list), \
-        "Argument *tokens* in pos_tag() function must be a list."
-    try:
-        levels = get_level(tokens)
-    except:
-        #TODO: throw a propper error message.
-        print("Something is wrong with the tokens list")
-    assert isinstance(levels, int), \
-        "Something wrong with the *tokens* list argument in pos_tag() function"
-    assert (levels>=1) and (levels<=3), \
-        "The depth of levels for *tokens* list must be in the range [1, 3]"
 
-    if (levels == 1):
-        return(nltk.pos_tag(tokens))
-    elif (levels == 2):
-        return(nltk.pos_tag_sents(tokens))
-    elif (levels == 3):
-        tagged = []
-        for paragraph in tokens:
-            tagged_sentences = nltk.pos_tag_sents(paragraph)
-            tagged.append(tagged_sentences)
-        return (tagged)
-    else:
-        #TODO: throw some error messsage
-        print("Something went wrong with pos_tag(). Double check your arguments.")
-        return(None)
+    levels = get_level(tokens)
+    return _multilevel_call(tokens,
+                            list_type = "token",
+                            level1_func = nltk.pos_tag,
+                            level2_func = nltk.pos_tag_sents)
 
 
 # ==============================================================================
