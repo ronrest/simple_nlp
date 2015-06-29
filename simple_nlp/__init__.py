@@ -214,7 +214,7 @@ CHUNK_PATTERN_NP3 = """CHUNKED_NP: {<RB.?>*<VB.?>*<NNP>+<NN>?}"""
 # ==============================================================================
 #                                                                          CHUNK
 # ==============================================================================
-def chunk(tagged_list, pattern=CHUNK_PATTERN_NP1):
+def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
     """
     Takes a list of POS tagged items, and chunks them according to the pattern.
 
@@ -230,6 +230,15 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP1):
     :param tagged_list: a list of POS tagged items.
     :param pattern: a chunking pattern. Several preset patterns exist:
                     - CHUNK_PATTERN_NP1  pattern for Noun Phrases
+    :param ne: (boolean) Make use of nltk's built in Named Entity Recognition?
+    :param binary_ne: (boolean) Should the built in Named Entity Recognition use
+                      binary classification?
+
+                      - True - will classify the chunks as either Named Entities
+                        or not.
+                      - False - will classify the Named Entities into different
+                        types, such as PERSON, ORGANIZATION, FACILITY, ... etc.
+
     :return: returns a list of trees, with certain tokens chunked together based
              on rules specified by the *pattern* variable.
 
@@ -240,11 +249,27 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP1):
         t = tokenize(s, levels_out=3)
         pos_tagged=pos_tag(t)
 
-        # Chunk based on Noun Phrases using the CHUNK_PATTERN_NP1 template
-        noun_phrase_chunked = chunk(pos_tagged, pattern=CHUNK_PATTERN_NP1)
+        # Chunk based on Noun Phrases using the CHUNK_PATTERN_NP2 template
+        noun_phrase_chunked = chunk(pos_tagged, pattern=CHUNK_PATTERN_NP2)
         noun_phrase_chunked[0][0].draw()
         noun_phrase_chunked[1][0].draw()
+
+        # Use the built nltk's built in Named Entity Recognition for chunking
+        ne_chunked = chunk(pos_tagged, ne=True)
+
+        # As above, but categorize the named entities by type
+        ne_chunked = chunk(pos_tagged, ne=True, binary_ne=False)
+
     """
+    # --------------------------------------------------------------------------
+    #                    Handle the use of the built in Named Entity Recognition
+    # --------------------------------------------------------------------------
+    if ne:
+        return (ne_chunk(tagged_list, binary_ne))
+
+    # --------------------------------------------------------------------------
+    #                                                     Perform Dummy Proofing
+    # --------------------------------------------------------------------------
     # #TODO: create a function called check_nesting_assumptions() since the
     # #      following is reused so often.
     # assert isinstance(tagged_list, list), \
@@ -261,6 +286,9 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP1):
     assert (levels >= 1) and (levels <= 3), \
          "The depth of levels for *tokens* list must be in the range [1, 3]"
 
+    # --------------------------------------------------------------------------
+    #                                    Perform Chunking based on Regex Pattern
+    # --------------------------------------------------------------------------
     chunker = nltk.RegexpParser(pattern)
     try:
         if (levels == 1):
