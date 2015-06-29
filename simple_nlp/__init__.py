@@ -211,6 +211,7 @@ CHUNKED_NP:     {<DT><WP><VBP>*<RB>*<VBN><IN><NN>}
 # Written by: Harrison Kinsley
 CHUNK_PATTERN_NP3 = """CHUNKED_NP: {<RB.?>*<VB.?>*<NNP>+<NN>?}"""
 
+
 # ==============================================================================
 #                                                                          CHUNK
 # ==============================================================================
@@ -277,6 +278,14 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
     levels = get_level(tagged_list, type="pos_tagged") # Depth of tagged_list
     chunker = nltk.RegexpParser(pattern)
     try:
+        return _multilevel_call(tagged_list,
+                                list_type = "pos_tagged",
+                                level1_func = chunker.parse)
+    except Exception as e:
+        # TODO: throw a real error message.
+        print("You have made the chunk() function go crazy!")
+        print(str(e))
+
 
 # ==============================================================================
 #                                                                MULTILEVEL CALL
