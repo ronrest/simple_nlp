@@ -198,7 +198,7 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
     """
     Takes a list of POS tagged items, and chunks them according to the pattern.
 
-    depending on how deeply nested the POS tagged items are, will determine
+    Depending on how deeply nested the POS tagged items are, will determine
     how deeply nested the tree chunk are.
 
     Note, that in the pattern, not only can you specify the chunking regular
@@ -248,14 +248,46 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
     # ==========================================================================
     # Handle the use of the built in Named Entity Recognition
     if ne:
-        return (ne_chunk(tagged_list, binary_ne))
+        return (named_entities(tagged_list, binary_ne))
 
     # Perform Chunking based on Regex Pattern
     levels = get_level(tagged_list, type="pos_tagged") # Depth of tagged_list
-    chunker = nltk.RegexpParser(pattern)
+    chunker = nltk.RegexpParser(pattern)               # nltk regex object
     return _multilevel_call(tagged_list,
                                 list_type = "pos_tagged",
                                 level1_func = chunker.parse)
+
+
+# ==============================================================================
+#                                                                 NAMED ENTITIES
+# ==============================================================================
+def named_entities(tagged_list, binary):
+    """
+    Takes a list of nested POS tagged tuples, and chunks them using nltk's
+    recomended named entity chunker.
+
+    Depending on how deeply nested the POS tagged items are, will determine
+    how deeply nested the returned trees are.
+
+    You can specify that you want the named entities to be classified by
+    different types of category by setting *binary* to False.
+
+    :param tagged_list: (list) A nested list of POS tagged tuples
+    :param binary: (boolean) should it use binary Named Entity classification?
+
+                   - True  - Anything that is a named entity will be labelled NE
+                   - False - Will classify the Named Entities into different
+                             types,like PERSON, ORGANIZATION, FACILITY, ... etc.
+    :return: returns a list of trees, with certain tokens chunked together.
+    """
+    # ==========================================================================
+    levels = get_level(tagged_list, type="pos_tagged")  # Depth of tagged_list
+    return _multilevel_call(tagged_list,
+                            list_type="pos_tagged",
+                            level1_func=nltk.ne_chunk,
+                            level2_func=nltk.ne_chunk_sents,
+                            binary=binary)
+
 
 # ==============================================================================
 #                                                                MULTILEVEL CALL
