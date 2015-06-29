@@ -51,6 +51,10 @@ def tokenize(text, levels_out=1):
         return([nltk.word_tokenize(sentence) for sentence in sentences])
     if (levels_out == 3):
         paragraphs = text.split("\n")
+
+        # Remove blank elements
+        paragraphs = [item for item in paragraphs if item is not ""]
+
         tokenized = []
         for paragraph in paragraphs:
             sentences = nltk.sent_tokenize(paragraph)
@@ -341,10 +345,17 @@ def _multilevel_call(x, list_type, level1_func, level2_func=None, **kwargs):
                 processed.append(processed_sentences)
             return processed
 
+    except IndexError:
+        raise IndexError(
+            "Sorry, but it appears that the elements in your list have \n"\
+            "inconsistent nesting levels. Please make sure that if you \n"\
+            "have lists within lists (within lists), that all branches \n"\
+            "are the same depth.")
     except Exception as e:
-        # TODO: throw a real error message.
-        print("Ohh oh! multilevel call went funny!")
-        print(str(e))
+        raise e("Oh ohh! _multilevel_call() function went funny! Please \n"\
+            "double check the values of the arguments you fed, make sure \n"\
+            "the assumptions are met. ")
+        #print(str(e))
         return(None)
 
 
