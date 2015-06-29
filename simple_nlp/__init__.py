@@ -182,13 +182,34 @@ def get_level(x, type="token", max_level=3):
 # ==============================================================================
 #                                                          CHUNK PRESET PATTERNS
 # ==============================================================================
-CHUNK_PATTERN_NP1  = """
+
+#-------------------------------------------------------------------------------
+# Noun Phrase Chunking Patterns
+#-------------------------------------------------------------------------------
+
+# This pattern was taken from
+# https://github.com/lukewrites/NP_chunking_with_nltk
+# Written by: lukewrites
+CHUNK_PATTERN_NP1 = """
+    NP: {<JJ>*<NN>+}
+    {<JJ>*<NN><CC>*<NN>+}
+"""
+
+# This pattern was taken from
+# https://github.com/lukewrites/NP_chunking_with_nltk
+# Written by: lukewrites
+CHUNK_PATTERN_NP2  = """
 CHUNKED_NP:     {<DT><WP><VBP>*<RB>*<VBN><IN><NN>}
                 {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
                 {<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}
                 {<JJ>*<NN|NNS|NNP|NNPS>+}
 """
 
+
+# This pattern was taken from
+# http://pythonprogramming.net/chunking-nltk-tutorial/
+# Written by: Harrison Kinsley
+CHUNK_PATTERN_NP3 = """CHUNKED_NP: {<RB.?>*<VB.?>*<NNP>+<NN>?}"""
 
 # ==============================================================================
 #                                                                          CHUNK
