@@ -229,7 +229,11 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
 
     :param tagged_list: a list of POS tagged items.
     :param pattern: a chunking pattern. Several preset patterns exist:
-                    - CHUNK_PATTERN_NP1  pattern for Noun Phrases
+
+                    - CHUNK_PATTERN_NP1  A simple pattern for Noun Phrases
+                    - CHUNK_PATTERN_NP2  A better pattern for Noun Phrases
+                    - CHUNK_PATTERN_NP3  Another pattern for Noun Phrases
+
     :param ne: (boolean) Make use of nltk's built in Named Entity Recognition?
     :param binary_ne: (boolean) Should the built in Named Entity Recognition use
                       binary classification?
@@ -268,27 +272,9 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
         return (ne_chunk(tagged_list, binary_ne))
 
     # --------------------------------------------------------------------------
-    #                                                     Perform Dummy Proofing
-    # --------------------------------------------------------------------------
-    # #TODO: create a function called check_nesting_assumptions() since the
-    # #      following is reused so often.
-    # assert isinstance(tagged_list, list), \
-    #     "Argument *tokens* in pos_tag() function must be a list."
-    try:
-        levels = get_level(tagged_list, type="pos_tagged")
-    except Exception as e:
-        # TODO: throw a real error message.
-        print(str(e))
-        #print("Something went with the tagged_list list")
-        return(None)
-    assert isinstance(levels, int), \
-         "Something wrong with the *tokens* list argument in pos_tag() function"
-    assert (levels >= 1) and (levels <= 3), \
-         "The depth of levels for *tokens* list must be in the range [1, 3]"
-
-    # --------------------------------------------------------------------------
     #                                    Perform Chunking based on Regex Pattern
     # --------------------------------------------------------------------------
+    levels = get_level(tagged_list, type="pos_tagged") # Depth of tagged_list
     chunker = nltk.RegexpParser(pattern)
     try:
         if (levels == 1):
@@ -304,7 +290,8 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
         else:
             # TODO: throw some error messsage
             print(
-                "Something went wrong with chunk(). Double check your arguments.")
+                "Something went wrong with the chunk() function.\n"\
+                "Double check your arguments.")
             return (None)
     except Exception as e:
         #TODO: throw a real error message.
