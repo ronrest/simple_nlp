@@ -246,27 +246,16 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
 
     """
     # ==========================================================================
-
-    # --------------------------------------------------------------------------
-    #                    Handle the use of the built in Named Entity Recognition
-    # --------------------------------------------------------------------------
+    # Handle the use of the built in Named Entity Recognition
     if ne:
         return (ne_chunk(tagged_list, binary_ne))
 
-    # --------------------------------------------------------------------------
-    #                                    Perform Chunking based on Regex Pattern
-    # --------------------------------------------------------------------------
+    # Perform Chunking based on Regex Pattern
     levels = get_level(tagged_list, type="pos_tagged") # Depth of tagged_list
     chunker = nltk.RegexpParser(pattern)
-    try:
-        return _multilevel_call(tagged_list,
+    return _multilevel_call(tagged_list,
                                 list_type = "pos_tagged",
                                 level1_func = chunker.parse)
-    except Exception as e:
-        # TODO: throw a real error message.
-        print("You have made the chunk() function go crazy!")
-        print(str(e))
-
 
 # ==============================================================================
 #                                                                MULTILEVEL CALL
