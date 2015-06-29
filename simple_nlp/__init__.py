@@ -129,7 +129,7 @@ def pos_tag(tokens):
 # ==============================================================================
 #                                                                      GET LEVEL
 # ==============================================================================
-def get_level(x, type="token"):
+def get_level(x, type="token", max_level=3):
     """
     Takes a list of token strings, and returns how many levels deep the tokens
     are.
@@ -138,15 +138,18 @@ def get_level(x, type="token"):
     :param type: (string) the type of element to look for.
                  type="token" looks for token strings
                  type="pos_tagged" looks for tuples with two string elements.
+    :param max_level (int) maximum allowed nested depth.
     :return: (int) an integer representing how many levels deep the desired
               items are
     """
     # TODO: test that all elements of the list are consistently the same depth.
 
-    assert isinstance(x, list), "Argument *x* in get_level must be a list"
+    assert isinstance(x, list), \
+        "Argument *x* in get_level() function must be a list"
     assert (type == "token") or (type == "pos_tagged"), \
         "Argument *type* in get_level() function only accepts the values " \
         "'token' or 'pos_tagged'"
+
 
     if type == "token":
         data_type = str
@@ -157,21 +160,24 @@ def get_level(x, type="token"):
 
     current_nest = x[0]
     level = 1
-    while level <= 3:
+    while level <= max_level:
         if isinstance(current_nest, data_type):
             break
-        elif not isinstance(current_nest, list):
-            #TODO: throw a type exception
-            print("x must be a nested list of {}".format(data_type_description))
-            return(None)
         else:
+            assert isinstance(current_nest, list), \
+                "Your {0} list must be a nested list of {1}"\
+                "".format(type, data_type_description)
             current_nest = current_nest[0]
             level += 1
-    if (level > 3):
+    if (level > max_level):
         #TODO: throw an error exception
-        print("You are in too deep! get_level() only processes up to 3 levels deep.")
+        assert level <= max_level, \
+             "You are in too deep! \nThe elements in your {0} list must be no "\
+             "deeper than {1} levels deep.".format(type, max_level)
         return(None)
-    return(level)
+    else:
+        return(level)
+
 
 # ==============================================================================
 #                                                          CHUNK PRESET PATTERNS
