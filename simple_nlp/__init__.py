@@ -60,6 +60,7 @@ def tokenize(text, levels_out=1):
 # ==============================================================================
 #                                                                    POS TAGGING
 # ==============================================================================
+# TODO: make it accept a single string that is not nested in a list.
 def pos_tag(tokens):
     """
     Takes a list of tokens and returns a list of "Part of Speech" (POS) Tagged
@@ -97,8 +98,6 @@ def pos_tag(tokens):
         pos_tag(d)
     """
     # ==========================================================================
-    # TODO: make it accept a single string that is not nested in a list.
-
     levels = get_level(tokens)
     return _multilevel_call(tokens,
                             list_type = "token",
@@ -109,6 +108,7 @@ def pos_tag(tokens):
 # ==============================================================================
 #                                                                      GET LEVEL
 # ==============================================================================
+# TODO: test that all elements of the list are consistently the same depth.
 def get_level(x, type="token", max_level=3):
     """
     Takes a list of token strings, and returns how many levels deep the tokens
@@ -122,8 +122,7 @@ def get_level(x, type="token", max_level=3):
     :return: (int) an integer representing how many levels deep the desired
               items are
     """
-    # TODO: test that all elements of the list are consistently the same depth.
-
+    # ==========================================================================
     assert isinstance(x, list), \
         "Argument *x* in get_level() function must be a list"
     assert (type == "token") or (type == "pos_tagged"), \
@@ -163,9 +162,9 @@ def get_level(x, type="token", max_level=3):
 #                                                          CHUNK PRESET PATTERNS
 # ==============================================================================
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Noun Phrase Chunking Patterns
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # This pattern was taken from
 # https://github.com/lukewrites/NP_chunking_with_nltk
@@ -246,6 +245,8 @@ def chunk(tagged_list, pattern=CHUNK_PATTERN_NP2, ne=False, binary_ne=False):
         ne_chunked = chunk(pos_tagged, ne=True, binary_ne=False)
 
     """
+    # ==========================================================================
+
     # --------------------------------------------------------------------------
     #                    Handle the use of the built in Named Entity Recognition
     # --------------------------------------------------------------------------
@@ -292,9 +293,8 @@ def _multilevel_call(x, list_type, level1_func, level2_func=None, **kwargs):
     :return: returns the output of the functions specified, applied to the
              elements of the list x.
     """
-    # Get the depth of list
-    levels = get_level(x, type=list_type, max_level=3)
-
+    # ==========================================================================
+    levels = get_level(x, type=list_type, max_level=3)  # Get the depth of list
     try:
         # -------------------------------------------------- Level 1
         if (levels == 1):
